@@ -58,7 +58,10 @@ describe('ProfileComponent', () => {
 
   it('should initialize with user data', () => {
     const userMock = { login: 'testuser' };
-    const reposMock = [{ stargazers_count: 5 }, { stargazers_count: 10 }];
+    const reposMock = [
+      { stargazers_count: 5, created_at: '2024-05-20T00:00:00Z' },
+      { stargazers_count: 10, created_at: '2024-05-19T00:00:00Z' },
+    ];
 
     spyOn(githubService, 'getUser').and.returnValue(of(userMock));
     spyOn(githubService, 'getRepos').and.returnValue(of(reposMock));
@@ -70,7 +73,15 @@ describe('ProfileComponent', () => {
       expect(component.user).toEqual(userMock);
       expect(component.userNotFound).toBeFalse();
       expect(component.repos).toEqual(
-        reposMock.sort((a, b) => b.stargazers_count - a.stargazers_count),
+        reposMock.sort((a, b) => {
+          if (b.stargazers_count === a.stargazers_count) {
+            return (
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+            );
+          }
+          return b.stargazers_count - a.stargazers_count;
+        }),
       );
     });
   });
@@ -100,6 +111,7 @@ describe('ProfileComponent', () => {
   it('should paginate repositories', () => {
     component.repos = Array.from({ length: 12 }, (_, i) => ({
       stargazers_count: i + 1,
+      created_at: new Date().toISOString(),
     }));
     component.currentPage = 2;
     const paginatedRepos = component.sortedRepos();
@@ -129,5 +141,16 @@ describe('ProfileComponent', () => {
     jasmine.clock().mockDate(currentDate); // Mock the current date
     const daysAgo = component.getDaysAgo('2024-05-20T00:00:00Z');
     expect(daysAgo).toBe(4);
+  });
+
+  it('should update URL and fetch new user data on search', () => {
+    const navigateSpy = spyOn(router, 'navigate');
+    const fetchUserDataSpy = spyOn(component, 'fetchUserData');
+    component.searchQuery = 'newuser';
+    component.searchUser();
+    expect(navigateSpy).toHaveBeenCalledWith(['/profile', 'newuser'], {
+      replaceUrl: true,
+    });
+    expect(fetchUserDataSpy).toHaveBeenCalledWith('newuser');
   });
 });
