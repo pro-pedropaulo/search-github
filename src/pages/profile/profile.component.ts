@@ -118,6 +118,9 @@ export class ProfileComponent implements OnInit {
 
   searchUser() {
     if (this.searchQuery) {
+      this.router.navigate(['/profile', this.searchQuery], {
+        replaceUrl: true,
+      });
       this.fetchUserData(this.searchQuery);
     }
   }
