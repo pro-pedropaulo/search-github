@@ -1,0 +1,87 @@
+<div class="search-bar">
+    <span class="gradient-text">Search d_evs</span>
+    <div class="search-input-container">
+        <mat-icon aria-hidden="true">search</mat-icon>
+        <input [(ngModel)]="searchQuery" placeholder="Digite o nome do usuário" aria-label="Search input for user" />
+    </div>
+    <button mat-raised-button color="primary" class="btn-search" (click)="searchUser()" aria-label="Search button">
+        Search
+    </button>
+</div>
+
+<div *ngIf="userNotFound" class="user-not-found">
+    USUÁRIO NÃO ENCONTRADO
+</div>
+
+<div class="profile-container" *ngIf="user">
+    <div class="profile-sidebar">
+        <mat-card class="user-profile">
+            <div class="profile-header">
+                <img mat-card-avatar [src]="user.avatar_url" alt="User avatar">
+                <div class="profile-info">
+                    <mat-card-title>{{ user.name }}</mat-card-title>
+                    <mat-card-subtitle>{{ user.login }}</mat-card-subtitle>
+                </div>
+            </div>
+            <mat-card-content>
+                <p *ngIf="user.bio">{{ user.bio }}</p>
+                <p *ngIf="user.followers !== null && user.following !== null">
+                    <app-svg-followers-icon class="svg" aria-hidden="true"></app-svg-followers-icon>
+                    {{ user.followers }} Seguidores
+                </p>
+                <p *ngIf="user.following !== null">
+                    <app-svg-following-icon class="svg" aria-hidden="true"></app-svg-following-icon>
+                    {{ user.following }} Seguindo
+                </p>
+                <p *ngIf="user.location">
+                    <app-svg-location-icon class="svg" aria-hidden="true"></app-svg-location-icon>
+                    {{ user.location }}
+                </p>
+                <p *ngIf="user.email">
+                    <app-svg-email-icon class="svg" aria-hidden="true"></app-svg-email-icon>
+                    {{ user.email }}
+                </p>
+                <p *ngIf="user.blog">
+                    <app-svg-blog-icon class="svg" aria-hidden="true"></app-svg-blog-icon>
+                    <a [href]="user.blog" target="_blank" rel="noopener noreferrer">Website</a>
+                </p>
+                <p *ngIf="user.twitter_username">
+                    <app-svg-twitter-icon aria-hidden="true"></app-svg-twitter-icon>
+                    <a [href]="'https://twitter.com/' + user.twitter_username" target="_blank"
+                        rel="noopener noreferrer">Twitter</a>
+                </p>
+            </mat-card-content>
+            <button mat-raised-button color="primary" (click)="goBack()" aria-label="Go back button">Back</button>
+        </mat-card>
+    </div>
+
+    <div class="repos-container" *ngIf="repos">
+        <mat-card *ngFor="let repo of sortedRepos()" class="repo-card">
+            <mat-card-title><a [href]="repo.html_url" target="_blank" rel="noopener noreferrer">{{ repo.name
+                    }}</a></mat-card-title>
+            <mat-card-content>
+                <p>{{ repo.description }}</p>
+                <div class="repo-stats">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M12 17.235L6.179 20L7.388 13.88L3 9.392L9.179 8.621L12 3L14.821 8.621L21 9.392L16.612 13.88L17.821 20L12 17.235Z"
+                            stroke="#4A5568" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    {{ repo.stargazers_count }}
+                    <span>• Atualizado há {{ getDaysAgo(repo.updated_at) }} dias</span>
+                </div>
+            </mat-card-content>
+        </mat-card>
+        <div class="pagination">
+            <button mat-raised-button color="primary" [disabled]="currentPage === 1" (click)="setPage(currentPage - 1)"
+                aria-label="Previous page button">
+                Anterior
+            </button>
+            <span>Página {{ currentPage }} de {{ totalPages() }}</span>
+            <button mat-raised-button color="primary" [disabled]="currentPage === totalPages()"
+                (click)="setPage(currentPage + 1)" aria-label="Next page button">
+                Próximo
+            </button>
+        </div>
+    </div>
+</div>
