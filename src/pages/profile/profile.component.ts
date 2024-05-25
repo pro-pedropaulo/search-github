@@ -72,8 +72,18 @@ export class ProfileComponent implements OnInit {
 
     this.githubService.getRepos(username).subscribe((repos: any[]) => {
       this.repos = repos.sort(
-        (a: { stargazers_count: number }, b: { stargazers_count: number }) =>
-          b.stargazers_count - a.stargazers_count,
+        (
+          a: { stargazers_count: number; created_at: string },
+          b: { stargazers_count: number; created_at: string },
+        ) => {
+          if (b.stargazers_count === a.stargazers_count) {
+            return (
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+            );
+          }
+          return b.stargazers_count - a.stargazers_count;
+        },
       );
     });
   }
