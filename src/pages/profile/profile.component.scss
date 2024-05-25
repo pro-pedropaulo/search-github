@@ -36,6 +36,7 @@
   border: none;
   outline: none;
   font-size: 16px;
+  background-color: transparent;
 }
 
 .search-input-container input:focus {
@@ -211,6 +212,10 @@ button:hover {
 
   .repos-container {
     width: 100%;
+  }
+
+  .search-input-container {
+    max-width: 300px;
   }
 }
 
